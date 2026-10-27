@@ -1,0 +1,611 @@
+{
+  "info": {
+    "_postman_id": "41fe20fc-8978-4bef-be0c-cb34b7e4c3ca",
+    "name": "My Collection",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59215194",
+    "_collection_link": "https://go.postman.co/collection/59215194-41fe20fc-8978-4bef-be0c-cb34b7e4c3ca?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Health API returns 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"API is Healthy\", function () {\n    pm.expect(pm.response.json().status).to.eql(\"Healthy\");\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/health",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "health"
+          ]
+        },
+        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+      },
+      "response": []
+    },
+    {
+      "name": "Post data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Donation created successfully\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Anonymous donor name is hidden\", function () {\n    const donation = pm.response.json();\n\n    pm.expect(donation.donorName).to.eql(\"Anonymous\");\n    pm.expect(donation.isAnonymous).to.eql(true);\n});\n\npm.collectionVariables.set(\"anonymousId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 200,\n  \"donorName\": \"Sara\",\n  \"isAnonymous\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Donations",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Donation by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 500,\r\n  \"donorName\": \"Ahmad Updated\",\r\n  \"isAnonymous\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Anonymous PUT",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Get donation returns 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Donation ID is correct\", function () {\r\n    const donation = pm.response.json();\r\n    pm.expect(donation.id).to.eql(2);\r\n});\r\n\r\npm.test(\"Anonymous name is hidden\", function () {\r\n    const donation = pm.response.json();\r\n\r\n    pm.expect(donation.donorName).to.eql(\"Anonymous\");\r\n    pm.expect(donation.isAnonymous).to.eql(true);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 300,\r\n  \"donorName\": \"Sara Updated\",\r\n  \"isAnonymous\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations/2",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Donation deleted successfully\", function () {\r\n    pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Pagination GET",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Pagination returns 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Pagination data is correct\", function () {\r\n    const data = pm.response.json();\r\n\r\n    pm.expect(data.totalDonations).to.be.a(\"number\");\r\n    pm.expect(data.totalPages).to.be.a(\"number\");\r\n    pm.expect(data.currentPage).to.eql(1);\r\n    pm.expect(data.pageSize).to.be.at.most(200);\r\n    pm.expect(data.donations).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Anonymous donor names are hidden\", function () {\r\n    const donations = pm.response.json().donations;\r\n\r\n    donations.forEach(function (donation) {\r\n        if (donation.isAnonymous) {\r\n            pm.expect(donation.donorName).to.eql(\"Anonymous\");\r\n        }\r\n    });\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations?page=1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Donation For Deletion",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Donation created\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\npm.collectionVariables.set(\"deleteId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 50,\r\n  \"donorName\": \"Test Donor\",\r\n  \"isAnonymous\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify Deleted Donation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Negative Amount Validation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Zero Amount",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Zero amount returns 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 0,\r\n  \"donorName\": \"Ahmad\",\r\n  \"isAnonymous\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Missing Donation Amount",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Missing amount returns 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Amount is required\", function () {\r\n    const response = pm.response.json();\r\n\r\n    pm.expect(response.errors).to.have.property(\"Amount\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"donorName\": \"Ahmad\",\r\n  \"isAnonymous\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Missing Donor Name",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Missing donor name returns 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Donor name is required\", function () {\r\n    const response = pm.response.json();\r\n\r\n    pm.expect(response.errors).to.have.property(\"DonorName\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 100,\r\n  \"isAnonymous\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Non-Numeric Donation ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Non-Existent Donation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Non-Existent Donation",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Updating non-existent donation returns 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 200,\r\n  \"donorName\": \"Ahmad\",\r\n  \"isAnonymous\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "Update Non-Existent Donation",
+          "host": [
+            "Update Non-Existent Donation"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Non-Existent Donation",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Deleting non-existent donation returns 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations/999999",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations",
+            "999999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Zero ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Page Number",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Invalid page number returns 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Correct error message\", function () {\r\n    pm.expect(pm.response.text()).to.include(\"Invalid page number.\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5010/api/donations?page=0",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5010",
+          "path": [
+            "api",
+            "donations"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "anonymousId",
+      "value": ""
+    },
+    {
+      "key": "deleteId",
+      "value": ""
+    }
+  ]
+}

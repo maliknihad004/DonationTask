@@ -14,6 +14,13 @@ builder.Services.AddDbContext<DonationDbContext>(options =>
 
 var app = builder.Build();
 
+// Apply database migrations
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DonationDbContext>();
+    db.Database.Migrate();
+}
+
 app.MapControllers();
 
 app.Run();

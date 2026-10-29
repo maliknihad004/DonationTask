@@ -1,3 +1,4 @@
+
 # Donation Management System
 
 A REST API built using ASP.NET Core (.NET 10), C#, Entity Framework Core, and PostgreSQL.
@@ -12,7 +13,8 @@ This project is backend-only. No frontend or authentication is required.
 - ASP.NET Core Web API (.NET 10)
 - Entity Framework Core
 - PostgreSQL
-- Swagger
+- Docker and Docker Compose
+- Swagger (if enabled in the application)
 - Postman
 
 ## 2. Project Structure
@@ -33,14 +35,18 @@ DonationTask/
 ├── postman/
 ├── Program.cs
 ├── DonationTask.csproj
+├── Dockerfile
+├── compose.yaml
+├── .dockerignore
+├── .env
 └── README.md
 ```
 
-## 3. Setup
+## 3. Setup (Without Docker)
 
 ### Requirements
 
-Before running the project, install:
+To run the project directly on your computer, install:
 
 - .NET 10 SDK
 - PostgreSQL
@@ -65,7 +71,9 @@ Restore the required packages:
 dotnet restore
 ```
 
-## 4. Database Configuration
+**Note:** If you use Docker Compose instead, you only need Docker with Docker Compose. You do not need to install .NET or PostgreSQL locally.
+
+## 4. Database Configuration (Without Docker)
 
 The application uses PostgreSQL to store donation records.
 
@@ -99,17 +107,17 @@ Exit PostgreSQL:
 
 Create a `.env` file in the project root directory.
 
-Add the following connection string:
+Add the following connection string for running without Docker:
 
 ```env
-ConnectionStrings__DefaultConnection="Host=localhost;Port=5432;Database=donation_management;Username=postgres;Password=YOUR_PASSWORD"
+ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=donation_management;Username=postgres;Password=YOUR_PASSWORD
 ```
 
 Replace `YOUR_PASSWORD` with your PostgreSQL password.
 
 The application loads the environment configuration when it starts.
 
-Do not upload the `.env` file to GitHub because it contains database credentials.
+Do not upload the `.env` file to GitHub because it contains database credentials. Add `.env` to `.gitignore` and `.dockerignore`.
 
 ### Apply Database Migrations
 
@@ -119,7 +127,7 @@ Run:
 dotnet ef database update
 ```
 
-This applies the EF Core migrations and creates the required database table.
+This applies the existing EF Core migrations and creates the required database table. The application is also configured to apply pending migrations on startup.
 
 ### Database Design
 
@@ -143,7 +151,7 @@ The database follows the basic normalization rules:
 
 Since the current system manages only donations, one table is sufficient.
 
-## 5. Running the Application
+## 5. Running the Application (Without Docker)
 
 Build the project:
 
@@ -177,7 +185,144 @@ Expected response:
 
 HTTP Status: `200 OK`
 
-## 6. API Endpoints
+## 6. Running with Docker Compose
+
+Docker Compose runs the ASP.NET Core API and PostgreSQL database in separate containers.
+
+### Requirements
+
+Install Docker and Docker Compose.
+
+You do not need to install .NET or PostgreSQL on your computer.
+
+### Step 1: Configure the Password
+
+Create a `.env` file in the same folder as `compose.yaml`.
+
+Add:
+
+```env
+DB_PASSWORD=YOUR_PASSWORD
+```
+
+Replace `YOUR_PASSWORD` with your chosen password.
+
+The `compose.yaml` file uses this password for PostgreSQL and gives the API this connection string:
+
+```text
+Host=db;Port=5432;Database=donation_management;Username=postgres;Password=${DB_PASSWORD}
+```
+
+`db` is the PostgreSQL service name inside Docker, so the API does not use `localhost` to connect to the database.
+
+Docker Compose automatically creates a shared bridge network for both containers.
+
+### Step 2: Build and Start
+
+Open the terminal in the project directory:
+
+```bash
+cd ~/internship/DonationTask
+```
+
+Build and start the containers:
+
+```bash
+docker compose up --build -d
+```
+
+This command:
+
+- Builds the API Docker image.
+- Starts the PostgreSQL container.
+- Waits until PostgreSQL is healthy.
+- Starts the API container.
+- Applies the existing database migrations when the API starts.
+
+### Step 3: Check the Containers
+
+Run:
+
+```bash
+docker compose ps
+```
+
+Both containers should be running, and PostgreSQL should show as healthy.
+
+To see the API logs:
+
+```bash
+docker compose logs api
+```
+
+The API should display:
+
+```text
+Now listening on: http://[::]:8080
+Application started.
+```
+
+### Step 4: Test the API
+
+Open Postman.
+
+Select the GET method and enter:
+
+```http
+GET http://localhost:8081/api/Donations
+```
+
+Click **Send**.
+
+A successful request returns `200 OK`.
+
+Example response when the database is empty:
+
+```json
+{
+  "totalDonations": 0,
+  "totalPages": 0,
+  "currentPage": 1,
+  "pageSize": 1,
+  "donations": []
+}
+```
+
+The API runs on port `8080` inside Docker, which is mapped to port `8081` on the computer.
+
+You can also test the health endpoint:
+
+```http
+GET http://localhost:8081/api/health
+```
+
+### Step 5: Stop the Containers
+
+Run:
+
+```bash
+docker compose down
+```
+
+To start the containers again:
+
+```bash
+docker compose up -d
+```
+
+### Docker Database Connection
+
+The API and PostgreSQL containers communicate through the Docker Compose network.
+
+The API uses `Host=db` to connect to the database container.
+
+A PostgreSQL health check ensures that the API waits until the database is ready before starting.
+
+Entity Framework Core applies the existing migrations to create the required tables.
+
+**Note:** The Docker database is separate from the PostgreSQL database installed on your computer. A named Docker volume should be used if donation data must survive container removal and recreation.
+
+## 7. API Endpoints
 
 The application supports the following REST API endpoints.
 
@@ -261,18 +406,15 @@ The application automatically calculates the page size based on the number of do
 
 Invalid page numbers return `400 Bad Request`.
 
-## 7. Swagger Access
+## 8. Swagger Access
 
-Swagger provides an interactive interface for testing the API endpoints.
+Swagger provides an interactive interface for testing API endpoints when it is configured and enabled in the application.
 
 ### Steps
 
-1. Start the application in the Development environment.
+1. Start the application in the Development environment with Swagger enabled.
 2. Open a browser.
-3. Navigate to:
-
-http://127.0.0.1:5010/swagger
-
+3. Navigate to http://127.0.0.1:5010/swagger.
 4. Select an API endpoint.
 5. Click **Try it out**.
 6. Enter the required parameters or JSON body.
@@ -280,7 +422,9 @@ http://127.0.0.1:5010/swagger
 
 Swagger displays the request, response, and HTTP status code.
 
-## 8. Postman Testing
+The Docker setup runs in Production mode, so use Postman for Docker API testing unless Swagger is separately enabled.
+
+## 9. Postman Testing
 
 Postman was used to test the REST API and verify the expected responses.
 
@@ -295,6 +439,10 @@ The exported Postman collection is included in the `postman` directory.
 5. Start the API.
 6. Open a request and click **Send**.
 7. Check the response and automated test results.
+
+For Docker, use `http://localhost:8081` as the base URL.
+
+For the local setup, use `http://127.0.0.1:5010`.
 
 ### Tests Performed
 
@@ -326,7 +474,7 @@ Postman automated test scripts use `pm.test()` to verify HTTP status codes and r
 
 Some requests depend on donations created by previous requests. These requests should be executed in the correct order when testing the collection.
 
-## 9. Key Design Decisions
+## 10. Key Design Decisions
 
 ### REST API Architecture
 
@@ -381,4 +529,3 @@ The page size is calculated automatically and is limited to a maximum of 200 rec
 ### UTC Timestamps
 
 The `CreatedAt` field is generated by the server using UTC when a donation is created.
-
